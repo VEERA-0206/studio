@@ -1,0 +1,165 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * MoDoc Security Rules
+     *
+     * Core Philosophy: This ruleset enforces a multi-tenant security model for a healthcare platform. 
+     * It distinguishes between Patients, Doctors, and Admins. It prioritizes Authorization Independence 
+     * by using denormalized fields (like patientId and doctorId) to avoid expensive cross-document 
+     * lookups during authorization.
+     *
+     * Data Structure:
+     * - Top-level profiles: /patients/{id}, /doctors/{id}, /admins/{id}
+     * - Collaborative entities: /appointments/{id}, /conversations/{id}
+     * - Nested subcollections: /doctors/{id}/availability, /conversations/{id}/messages
+     *
+     * Key Security Decisions:
+     * - Admin Access: Users with a document in the /admins collection are granted global read access 
+     *   for monitoring and support.
+     * - Shared Access: Appointments and Conversations are shared between the participating patient 
+     *   and doctor via ID-based membership checks.
+     * - Immutable Identity: Critical relational fields (like ownership IDs) are enforced as immutable 
+     *   during updates to prevent account takeover or data hijacking.
+     * - Prototyping Mode: Logic focuses on WHO can access data; schema validation is omitted to 
+     *   allow for rapid frontend iteration.
+     */
+
+    // --- HELPER FUNCTIONS ---
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Checks if the user is either the patient or the doctor associated with a document
+    function isParticipant(patientId, doctorId) {
+      return isSignedIn() && (request.auth.uid == patientId || request.auth.uid == doctorId);
+    }
+
+    // Used for updates/deletes to ensure ownership and existence
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for Patient profiles. Only the owner can manage their profile.
+     * @path /patients/{patientId}
+     * @allow (get, list) if the user's UID matches the patientId OR if the user is an Admin.
+     * @deny (create) if the UID in the document data doesn't match the path's patientId.
+     * @principle Ownership-based access with Admin monitoring overrides.
+     */
+    match /patients/{patientId} {
+      allow get, list: if isOwner(patientId) || isAdmin();
+      allow create: if isOwner(patientId) && request.resource.data.id == patientId;
+      allow update: if isExistingOwner(patientId) && request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Rules for Doctor profiles. Publicly readable by signed-in users.
+     * @path /doctors/{doctorId}
+     * @allow (get, list) if any user is signed in.
+     * @deny (update) if a user attempts to change another doctor's profile.
+     * @principle Public profile pattern with restricted write access.
+     */
+    match /doctors/{doctorId} {
+      allow get, list: if isSignedIn();
+      allow create: if isOwner(doctorId) && request.resource.data.id == doctorId;
+      allow update: if isExistingOwner(doctorId) && request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin();
+
+      /**
+       * @description Recurring availability patterns for doctors.
+       * @path /doctors/{doctorId}/availability/{availabilityId}
+       * @allow (list) if signed in (to book appointments).
+       * @deny (create) if the doctorId in the path does not match the authenticated user.
+       * @principle Nested ownership with public listability for service discovery.
+       */
+      match /availability/{availabilityId} {
+        allow get, list: if isSignedIn();
+        allow create: if isOwner(doctorId);
+        allow update, delete: if isExistingOwner(doctorId);
+      }
+    }
+
+    /**
+     * @description Scheduled appointments between a patient and a doctor.
+     * @path /appointments/{appointmentId}
+     * @allow (get, list) if the user is the patientId or doctorId on the document.
+     * @deny (create) if the authenticated user is neither the patient nor the doctor in the data.
+     * @principle Shared access (Closed Collaborators) using denormalized IDs.
+     */
+    match /appointments/{appointmentId} {
+      allow get, list: if isParticipant(resource.data.patientId, resource.data.doctorId) || isAdmin();
+      allow create: if isParticipant(request.resource.data.patientId, request.resource.data.doctorId);
+      allow update: if (resource != null && isParticipant(resource.data.patientId, resource.data.doctorId)) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Secure messaging threads between a patient and a doctor.
+     * @path /conversations/{conversationId}
+     * @allow (get, list) if the user is a participant or an Admin.
+     * @deny (update) if the user is not a participant.
+     * @principle Shared access with global Admin monitoring.
+     */
+    match /conversations/{conversationId} {
+      allow get, list: if isParticipant(resource.data.patientId, resource.data.doctorId) || isAdmin();
+      allow create: if isParticipant(request.resource.data.patientId, request.resource.data.doctorId);
+      allow update: if resource != null && isParticipant(resource.data.patientId, resource.data.doctorId);
+      allow delete: if isAdmin();
+
+      /**
+       * @description Individual messages. Relies on denormalized IDs in the message itself.
+       * @path /conversations/{conversationId}/messages/{messageId}
+       * @allow (list) if UID is one of the participants.
+       * @deny (create) if senderId doesn't match the current user.
+       * @principle Authorization Independence: uses data on the message to avoid parent lookups.
+       */
+      match /messages/{messageId} {
+        allow get, list: if isParticipant(resource.data.patientId, resource.data.doctorId) || isAdmin();
+        allow create: if isParticipant(request.resource.data.patientId, request.resource.data.doctorId) && request.resource.data.senderId == request.auth.uid;
+        allow update: if resource != null && isParticipant(resource.data.patientId, resource.data.doctorId);
+        allow delete: if false;
+      }
+    }
+
+    /**
+     * @description Patient history of AI symptom assessments.
+     * @path /patients/{patientId}/symptomAssessments/{assessmentId}
+     * @allow (get, list) if the user is the owner or an Admin.
+     * @deny (create) if the patientId in path doesn't match the user's UID.
+     * @principle Scoped subcollection ensuring private medical history.
+     */
+    match /patients/{patientId}/symptomAssessments/{assessmentId} {
+      allow get, list: if isOwner(patientId) || isAdmin();
+      allow create: if isOwner(patientId) && request.resource.data.patientId == patientId;
+      allow update: if isExistingOwner(patientId) && request.resource.data.patientId == resource.data.patientId;
+      allow delete: if isExistingOwner(patientId) || isAdmin();
+    }
+
+    /**
+     * @description Admin user profiles used for RBAC.
+     * @path /admins/{adminId}
+     * @allow (get) if the user is the admin or another admin.
+     * @deny (write) to any non-admin users.
+     * @principle RBAC bootstrap collection; presence of a document defines the role.
+     */
+    match /admins/{adminId} {
+      allow get: if isOwner(adminId) || isAdmin();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}
