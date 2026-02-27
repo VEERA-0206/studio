@@ -1,13 +1,49 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Video, ShieldCheck, MessageCircle, Clock, ArrowRight, BrainCircuit } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Video, ShieldCheck, MessageCircle, Clock, ArrowRight, BrainCircuit, Building2, MapPin, BadgeCheck } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-medical');
+  
+  const COIMBATORE_HOSPITALS = [
+    {
+      id: "hospital-kg",
+      name: "KG Hospital",
+      location: "Arts College Road",
+      desc: "NABH Accredited Tertiary care hospital specializing in Cardiology and Nephrology.",
+      image: PlaceHolderImages.find(img => img.id === 'hospital-kg')?.imageUrl,
+      specialty: "Cardiology"
+    },
+    {
+      id: "hospital-ganga",
+      name: "Ganga Hospital",
+      location: "Mettupalayam Road",
+      desc: "World-renowned center for Orthopaedics, Trauma and Plastic Surgery.",
+      image: PlaceHolderImages.find(img => img.id === 'hospital-ganga')?.imageUrl,
+      specialty: "Orthopaedics"
+    },
+    {
+      id: "hospital-psg",
+      name: "PSG Hospitals",
+      location: "Peelamedu",
+      desc: "Multispeciality teaching hospital offering comprehensive patient care and research.",
+      image: PlaceHolderImages.find(img => img.id === 'hospital-psg')?.imageUrl,
+      specialty: "General Medicine"
+    },
+    {
+      id: "hospital-kmch",
+      name: "KMCH",
+      location: "Avinashi Road",
+      desc: "A modern multi-specialty hospital with state-of-the-art diagnostic facilities.",
+      image: PlaceHolderImages.find(img => img.id === 'hospital-kmch')?.imageUrl,
+      specialty: "Multi-Specialty"
+    }
+  ];
 
   return (
     <div className="flex flex-col gap-16 pb-16">
@@ -56,6 +92,66 @@ export default function Home() {
               )}
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent pointer-events-none" />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Hospitals Section */}
+      <section className="bg-muted/30 py-20">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+            <div className="space-y-4 max-w-2xl">
+              <Badge variant="outline" className="bg-white border-primary/20 text-primary">Regional Partners</Badge>
+              <h2 className="text-4xl font-bold font-headline">Top Hospitals in Coimbatore</h2>
+              <p className="text-muted-foreground">
+                We've partnered with the most prestigious medical institutions in Coimbatore, 
+                Tamil Nadu, to bring world-class healthcare directly to your screen.
+              </p>
+            </div>
+            <Link href="/hospitals">
+              <Button variant="ghost" className="text-primary font-bold group">
+                View All Facilities <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {COIMBATORE_HOSPITALS.map((hospital) => (
+              <Card key={hospital.id} className="group border-none shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden bg-white">
+                <div className="relative h-48 overflow-hidden">
+                  {hospital.image && (
+                    <Image
+                      src={hospital.image}
+                      alt={hospital.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                  )}
+                  <div className="absolute top-3 left-3">
+                    <Badge className="bg-primary/90 hover:bg-primary shadow-lg">{hospital.specialty}</Badge>
+                  </div>
+                </div>
+                <CardHeader className="p-5">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                    <MapPin className="h-3 w-3 text-primary" />
+                    {hospital.location}, Coimbatore
+                  </div>
+                  <CardTitle className="text-xl group-hover:text-primary transition-colors">{hospital.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="px-5 pb-5">
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                    {hospital.desc}
+                  </p>
+                  <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-green-600 uppercase tracking-widest">
+                      <BadgeCheck className="h-3 w-3" />
+                      Partnered
+                    </div>
+                    <Button variant="link" size="sm" className="h-auto p-0 text-primary">Learn More</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>

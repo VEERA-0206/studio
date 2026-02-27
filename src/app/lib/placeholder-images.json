@@ -24,6 +24,30 @@
       "description": "Modern medical facility hallway",
       "imageUrl": "https://picsum.photos/seed/medical-hero/1200/600",
       "imageHint": "medical hospital"
+    },
+    {
+      "id": "hospital-kg",
+      "description": "KG Hospital Coimbatore Building",
+      "imageUrl": "https://picsum.photos/seed/kghospital/600/400",
+      "imageHint": "modern hospital"
+    },
+    {
+      "id": "hospital-ganga",
+      "description": "Ganga Hospital Coimbatore Entrance",
+      "imageUrl": "https://picsum.photos/seed/gangahospital/600/400",
+      "imageHint": "medical center"
+    },
+    {
+      "id": "hospital-psg",
+      "description": "PSG Hospitals Coimbatore Campus",
+      "imageUrl": "https://picsum.photos/seed/psghospital/600/400",
+      "imageHint": "university hospital"
+    },
+    {
+      "id": "hospital-kmch",
+      "description": "KMCH Coimbatore Modern Facility",
+      "imageUrl": "https://picsum.photos/seed/kmch/600/400",
+      "imageHint": "advanced clinic"
     }
   ]
 }

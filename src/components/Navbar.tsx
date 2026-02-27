@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, User, BrainCircuit, ShieldCheck, LogOut, Loader2 } from "lucide-react";
+import { Stethoscope, User, BrainCircuit, ShieldCheck, LogOut, Loader2, Building2 } from "lucide-react";
 import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { doc } from "firebase/firestore";
@@ -44,7 +44,11 @@ export function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
-          <Link href="/doctors" className="text-sm font-medium hover:text-primary transition-colors">Find Doctors</Link>
+          <Link href="/doctors" className="text-sm font-medium hover:text-primary transition-colors">Specialists</Link>
+          <Link href="/hospitals" className="flex items-center gap-1.5 text-sm font-medium hover:text-primary transition-colors">
+            <Building2 className="h-4 w-4" />
+            Hospitals
+          </Link>
           <Link href="/ai-assessment" className="flex items-center gap-1.5 text-sm font-medium hover:text-primary transition-colors">
             <BrainCircuit className="h-4 w-4" />
             AI Assessment

@@ -161,6 +161,21 @@
         "licenseNumber"
       ]
     },
+    "Hospital": {
+      "title": "Hospital",
+      "type": "object",
+      "description": "Represents a physical hospital facility affiliated with the MoDoc network.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "address": { "type": "string" },
+        "city": { "type": "string" },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "specialties": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "name", "city"]
+    },
     "DoctorAvailability": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "DoctorAvailability",
@@ -488,11 +503,11 @@
           "schema": {
             "$ref": "#/backend/entities/Patient"
           },
-          "description": "Individual patient profiles. Accessible only by the owning patient. `{patientId}` maps to `request.auth.uid`.",
+          "description": "Individual patient profiles. Accessible only by the owning patient.",
           "params": [
             {
               "name": "patientId",
-              "description": "The unique identifier of the patient, corresponding to their external authentication ID (`request.auth.uid`)."
+              "description": "The unique identifier of the patient."
             }
           ]
         }
@@ -504,11 +519,27 @@
           "schema": {
             "$ref": "#/backend/entities/Doctor"
           },
-          "description": "Individual doctor profiles. Doctors own their profiles. Patients can read public aspects of any doctor. Admins can read all doctor data. `{doctorId}` maps to `request.auth.uid`.",
+          "description": "Individual doctor profiles. Publicly readable for discovery.",
           "params": [
             {
               "name": "doctorId",
-              "description": "The unique identifier of the doctor, corresponding to their external authentication ID (`request.auth.uid`)."
+              "description": "The unique identifier of the doctor."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/hospitals/{hospitalId}",
+        "definition": {
+          "entityName": "Hospital",
+          "schema": {
+            "$ref": "#/backend/entities/Hospital"
+          },
+          "description": "Affiliated hospital profiles. Publicly readable.",
+          "params": [
+            {
+              "name": "hospitalId",
+              "description": "The unique identifier of the hospital."
             }
           ]
         }
@@ -520,15 +551,15 @@
           "schema": {
             "$ref": "#/backend/entities/DoctorAvailability"
           },
-          "description": "Specific availability patterns for a doctor. Owned by the doctor. Patients can query this subcollection to find available slots for scheduling. Includes denormalized 'doctorId' for clear ownership.",
+          "description": "Specific availability patterns for a doctor. Publicly readable.",
           "params": [
             {
               "name": "doctorId",
-              "description": "The unique identifier of the doctor who owns this availability record."
+              "description": "The unique identifier of the doctor."
             },
             {
               "name": "availabilityId",
-              "description": "The unique identifier for a specific doctor availability slot."
+              "description": "The unique identifier for a specific availability slot."
             }
           ]
         }
@@ -540,7 +571,7 @@
           "schema": {
             "$ref": "#/backend/entities/Appointment"
           },
-          "description": "Scheduled virtual consultations. Accessible by the specific patient (`patientId`) and doctor (`doctorId`) involved. Includes both `patientId` and `doctorId` for authorization independence.",
+          "description": "Scheduled virtual consultations.",
           "params": [
             {
               "name": "appointmentId",
@@ -556,7 +587,7 @@
           "schema": {
             "$ref": "#/backend/entities/Conversation"
           },
-          "description": "Secure messaging threads between a specific patient and doctor. Accessible by the `patientId` and `doctorId` involved. Includes both `patientId` and `doctorId` for authorization independence.",
+          "description": "Secure messaging threads.",
           "params": [
             {
               "name": "conversationId",
@@ -572,15 +603,15 @@
           "schema": {
             "$ref": "#/backend/entities/Message"
           },
-          "description": "Individual messages within a conversation. Accessible by the `patientId` and `doctorId` of the parent conversation. **Requires denormalization of `patientId` and `doctorId` from the parent `Conversation` document for authorization independence.**",
+          "description": "Individual messages within a conversation.",
           "params": [
             {
               "name": "conversationId",
-              "description": "The unique identifier of the parent conversation to which this message belongs."
+              "description": "The unique identifier of the parent conversation."
             },
             {
               "name": "messageId",
-              "description": "The unique identifier for a specific message within a conversation."
+              "description": "The unique identifier for a specific message."
             }
           ]
         }
@@ -592,11 +623,11 @@
           "schema": {
             "$ref": "#/backend/entities/SymptomAssessment"
           },
-          "description": "Patient's history of AI symptom assessments. Accessible only by the owning patient. `{patientId}` maps to `request.auth.uid`. Includes denormalized 'patientId' for clear ownership.",
+          "description": "Patient's history of AI symptom assessments.",
           "params": [
             {
               "name": "patientId",
-              "description": "The unique identifier of the patient who performed the assessment."
+              "description": "The unique identifier of the patient."
             },
             {
               "name": "assessmentId",
@@ -612,16 +643,16 @@
           "schema": {
             "$ref": "#/backend/entities/Admin"
           },
-          "description": "Administrative user profiles. Existence of a document at `admins/{request.auth.uid}` grants admin privileges. Admins can manage their own profile. Other admin privileges (e.g., viewing all appointments) are granted by the existence of this document and checked in rules for other collections. `{adminId}` maps to `request.auth.uid`.",
+          "description": "Administrative user profiles.",
           "params": [
             {
               "name": "adminId",
-              "description": "The unique identifier of the admin, corresponding to their external authentication ID (`request.auth.uid`)."
+              "description": "The unique identifier of the admin."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure for MoDoc is designed with a strong emphasis on Authorization Independence, Structural Segregation, and consistent Access Modeling to ensure security, scalability, and debuggability. \n\n**Authorization Independence:**\nThis design crucially avoids hierarchical authorization dependencies that would require `get()` calls in security rules. For user-specific profiles and related data (e.g., `Patient`, `Doctor`, `Admin` profiles, `DoctorAvailability`, `SymptomAssessment`), ownership is directly encoded in the path, where `{userId}` wildcards (`patientId`, `doctorId`, `adminId`) map to `request.auth.uid`. This allows rules to perform direct path comparisons, ensuring atomic and efficient authorization checks.\n\nFor collaborative entities like `Appointment` and `Conversation`, the `patientId` and `doctorId` are explicitly stored within each document. This denormalization means that security rules can directly check `resource.data.patientId == request.auth.uid || resource.data.doctorId == request.auth.uid` without needing to fetch a parent document, thus maintaining authorization independence and supporting atomic operations (e.g., creating an appointment without needing to first verify parent entities). \n\nCrucially, for `Message` subcollections under `Conversation`, the `patientId` and `doctorId` from the parent `Conversation` *must be denormalized* into each `Message` document. This allows security rules for messages to directly evaluate `request.auth.uid == resource.data.patientId || request.auth.uid == resource.data.doctorId`, completely eliminating any `get()` operations on the parent `Conversation` document.\n\n**QAPs (Rules are not Filters):**\n1.  **Patient and Doctor Profiles:** `/patients/{patientId}` and `/doctors/{doctorId}` allow individual users to manage their profiles. Patients can list (query) public aspects of doctors, while rules ensure private fields are protected or only accessible to the owning doctor. All doctors can be listed, with rules ensuring the list operation itself is permissible based on the user's role.\n2.  **Doctor Availability:** `/doctors/{doctorId}/availability/{availabilityId}` allows doctors to manage their specific slots, and patients can query a specific doctor's availability securely.\n3.  **Appointments and Conversations:** `/appointments/{appointmentId}` and `/conversations/{conversationId}` allow both patients and doctors to query and list *their own* respective appointments and conversations by using `where('patientId', '==', request.auth.uid)` or `where('doctorId', '==', request.auth.uid)`. The denormalized `patientId` and `doctorId` fields in these top-level collections enable these secure list operations without data leakage.\n4.  **Messages:** `/conversations/{conversationId}/messages/{messageId}`. Once a user has access to a specific conversation (which is guaranteed by the `patientId` and `doctorId` fields on the conversation itself), they can list the messages within that conversation. The denormalized `patientId` and `doctorId` in each message document ensure that only the authorized participants can list the messages, upholding the QAP principle.\n5.  **Symptom Assessments:** `/patients/{patientId}/symptomAssessments/{assessmentId}` ensures patients can securely list *their own* assessment history.\n6.  **Admin Monitoring:** The `/admins/{adminId}` collection serves as a Database Access Control (DBAC) mechanism. If an `Admin` document exists for `request.auth.uid`, that user is granted global read/list access to central collections like `/patients`, `/doctors`, `/appointments`, and `/conversations`. This is a clear QAP as admin `list` operations are not filtered by document data but by the presence of a global role, allowing comprehensive monitoring."
+    "reasoning": "Standard structure with added Hospital entity for location-based facility discovery."
   }
 }
