@@ -4,10 +4,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, User, MessageSquare, LayoutDashboard, BrainCircuit, ShieldCheck, LogOut, Loader2 } from "lucide-react";
+import { Stethoscope, User, BrainCircuit, ShieldCheck, LogOut, Loader2 } from "lucide-react";
 import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { doc } from "firebase/firestore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Navbar() {
   const { user, isUserLoading } = useUser();
@@ -16,7 +17,14 @@ export function Navbar() {
   const router = useRouter();
 
   const adminDocRef = useMemoFirebase(() => (user && db) ? doc(db, "admins", user.uid) : null, [user, db]);
+  const patientDocRef = useMemoFirebase(() => (user && db) ? doc(db, "patients", user.uid) : null, [user, db]);
+  const doctorDocRef = useMemoFirebase(() => (user && db) ? doc(db, "doctors", user.uid) : null, [user, db]);
+
   const { data: adminData } = useDoc(adminDocRef);
+  const { data: patientData } = useDoc(patientDocRef);
+  const { data: doctorData } = useDoc(doctorDocRef);
+
+  const profile = patientData || doctorData;
 
   const handleLogout = async () => {
     if (auth) {
@@ -60,9 +68,18 @@ export function Navbar() {
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           ) : user ? (
             <div className="flex items-center gap-3">
-              <span className="hidden sm:inline text-xs text-muted-foreground font-medium truncate max-w-[120px]">
-                {user.email}
-              </span>
+              <div className="hidden sm:flex flex-col items-end">
+                <span className="text-xs font-bold leading-none">
+                  {profile?.firstName ? `${profile.firstName} ${profile.lastName}` : user.email}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  {patientData ? 'Patient' : doctorData ? 'Practitioner' : 'User'}
+                </span>
+              </div>
+              <Avatar className="h-8 w-8 border">
+                <AvatarImage src={profile?.profileImageUrl} alt={user.email || ''} />
+                <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+              </Avatar>
               <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
                 <LogOut className="h-5 w-5 text-muted-foreground hover:text-destructive transition-colors" />
               </Button>

@@ -36,6 +36,8 @@ export default function RegisterPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      
+      const profileImageUrl = `https://picsum.photos/seed/${user.uid}/400/400`;
 
       if (type === 'patient') {
         await setDoc(doc(db, "patients", user.uid), {
@@ -44,6 +46,7 @@ export default function RegisterPage() {
           firstName,
           lastName,
           email,
+          profileImageUrl,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
@@ -56,6 +59,7 @@ export default function RegisterPage() {
           firstName,
           lastName,
           email,
+          profileImageUrl,
           specializations: [specialty],
           licenseNumber: license,
           createdAt: serverTimestamp(),

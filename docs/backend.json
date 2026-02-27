@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "Patient": {
@@ -26,6 +27,11 @@
           "type": "string",
           "description": "The patient's email address, used for communication and identification.",
           "format": "email"
+        },
+        "profileImageUrl": {
+          "type": "string",
+          "description": "URL to the patient's profile picture.",
+          "format": "uri"
         },
         "phoneNumber": {
           "type": "string",

@@ -4,10 +4,25 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Video, Clock, MessageSquare, User, MoreVertical, CheckCircle, ArrowUpRight } from "lucide-react";
+import { Calendar, Video, Clock, MessageSquare, User, MoreVertical, CheckCircle, ArrowUpRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function DashboardPage() {
+  const { user, isUserLoading } = useUser();
+  const db = useFirestore();
+
+  const patientRef = useMemoFirebase(() => (user && db) ? doc(db, "patients", user.uid) : null, [user, db]);
+  const doctorRef = useMemoFirebase(() => (user && db) ? doc(db, "doctors", user.uid) : null, [user, db]);
+  
+  const { data: patientProfile, isLoading: isPatientLoading } = useDoc(patientRef);
+  const { data: doctorProfile, isLoading: isDoctorLoading } = useDoc(doctorRef);
+
+  const profile = patientProfile || doctorProfile;
+  const isLoadingProfile = isUserLoading || isPatientLoading || isDoctorLoading;
+
   const appointments = [
     {
       id: "app-1",
@@ -27,12 +42,26 @@ export default function DashboardPage() {
     }
   ];
 
+  if (isLoadingProfile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold font-headline">Welcome back, John!</h1>
-          <p className="text-muted-foreground">Here's an overview of your health activities.</p>
+        <div className="flex items-center gap-4">
+          <Avatar className="h-16 w-16 border-2 border-primary">
+            <AvatarImage src={profile?.profileImageUrl} alt={profile?.firstName} />
+            <AvatarFallback><User className="h-8 w-8" /></AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-3xl font-bold font-headline">Welcome back, {profile?.firstName || 'User'}!</h1>
+            <p className="text-muted-foreground">Here's an overview of your health activities.</p>
+          </div>
         </div>
         <Link href="/doctors">
           <Button className="bg-primary hover:bg-accent shadow-lg shadow-primary/20">
