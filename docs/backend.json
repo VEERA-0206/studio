@@ -118,7 +118,11 @@
         },
         "hospitalId": {
           "type": "string",
-          "description": "The ID of the hospital where the doctor is affiliated."
+          "description": "The internal ID of the hospital where the doctor is primarily affiliated."
+        },
+        "hospitalName": {
+          "type": "string",
+          "description": "The display name of the current hospital or clinic affiliation."
         },
         "specializations": {
           "type": "array",
@@ -129,7 +133,7 @@
         },
         "bio": {
           "type": "string",
-          "description": "A short biographical description of the doctor, highlighting their experience and approach."
+          "description": "A detailed biographical description highlighting professional experience and previous hospital affiliations."
         },
         "profileImageUrl": {
           "type": "string",
