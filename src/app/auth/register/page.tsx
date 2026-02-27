@@ -14,6 +14,14 @@ import { useAuth, useFirestore } from "@/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const HOSPITALS = [
+  { id: "hospital-kg", name: "KG Hospital" },
+  { id: "hospital-ganga", name: "Ganga Hospital" },
+  { id: "hospital-psg", name: "PSG Hospitals" },
+  { id: "hospital-kmch", name: "KMCH" },
+];
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +29,7 @@ export default function RegisterPage() {
   const db = useFirestore ? useFirestore() : null;
   const router = useRouter();
   const { toast } = useToast();
+  const [selectedHospital, setSelectedHospital] = useState("");
 
   const handleRegister = async (e: React.FormEvent, type: 'patient' | 'doctor') => {
     e.preventDefault();
@@ -62,6 +71,7 @@ export default function RegisterPage() {
           profileImageUrl,
           specializations: [specialty],
           licenseNumber: license,
+          hospitalId: selectedHospital,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
           averageRating: 0
@@ -145,6 +155,19 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <Label htmlFor="specialty">Specialization</Label>
                   <Input id="specialty" name="specialty" placeholder="e.g. Cardiology" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hospital">Affiliated Hospital</Label>
+                  <Select onValueChange={setSelectedHospital} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a hospital" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {HOSPITALS.map(h => (
+                        <SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="license">Medical License Number</Label>

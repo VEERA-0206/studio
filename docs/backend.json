@@ -116,6 +116,10 @@
           "type": "string",
           "description": "The doctor's contact phone number."
         },
+        "hospitalId": {
+          "type": "string",
+          "description": "The ID of the hospital where the doctor is affiliated."
+        },
         "specializations": {
           "type": "array",
           "description": "A list of medical specializations the doctor holds (e.g., 'Cardiology', 'Pediatrics').",
@@ -653,6 +657,6 @@
         }
       }
     ],
-    "reasoning": "Standard structure with added Hospital entity for location-based facility discovery."
+    "reasoning": "Standard structure with added Hospital entity for location-based facility discovery and hospitalId for doctor affiliation."
   }
 }
