@@ -5,7 +5,7 @@ import { use } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Star, User, Loader2, ArrowLeft, Stethoscope, Video, Calendar, ExternalLink } from "lucide-react";
+import { MapPin, Star, User, Loader2, ArrowLeft, Stethoscope, Video, Calendar, ExternalLink, Navigation } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
@@ -20,7 +20,8 @@ const TAMILNADU_HOSPITALS = [
     location: "Arts College Road",
     desc: "NABH Accredited Tertiary care hospital specializing in Cardiology and Nephrology.",
     specialty: "Cardiology",
-    website: "https://www.kghospital.com/"
+    website: "https://www.kghospital.com/",
+    mapQuery: "KG+Hospital+Coimbatore"
   },
   {
     id: "hospital-ganga",
@@ -29,7 +30,8 @@ const TAMILNADU_HOSPITALS = [
     location: "Mettupalayam Road",
     desc: "World-renowned center for Orthopaedics, Trauma and Plastic Surgery.",
     specialty: "Orthopaedics",
-    website: "https://www.gangahospital.com/"
+    website: "https://www.gangahospital.com/",
+    mapQuery: "Ganga+Hospital+Coimbatore"
   },
   {
     id: "hospital-psg",
@@ -38,7 +40,8 @@ const TAMILNADU_HOSPITALS = [
     location: "Peelamedu",
     desc: "Multispeciality teaching hospital offering comprehensive patient care and research.",
     specialty: "General Medicine",
-    website: "https://www.psghospitals.com/"
+    website: "https://www.psghospitals.com/",
+    mapQuery: "PSG+Hospitals+Coimbatore"
   },
   {
     id: "hospital-kmch",
@@ -47,7 +50,8 @@ const TAMILNADU_HOSPITALS = [
     location: "Avinashi Road",
     desc: "A modern multi-specialty hospital with state-of-the-art diagnostic facilities.",
     specialty: "Multi-Specialty",
-    website: "https://www.kmchhospitals.com/"
+    website: "https://www.kmchhospitals.com/",
+    mapQuery: "KMCH+Hospital+Coimbatore"
   }
 ];
 
@@ -116,7 +120,7 @@ export default function HospitalDetailsPage({ params }: { params: Promise<{ id: 
       </div>
 
       <div className="container mx-auto px-4 mt-12 grid lg:grid-cols-3 gap-12">
-        {/* About Section */}
+        {/* About & Specialists Section */}
         <div className="lg:col-span-2 space-y-12">
           <section className="space-y-6">
             <div className="flex items-center justify-between border-b pb-4">
@@ -199,6 +203,52 @@ export default function HospitalDetailsPage({ params }: { params: Promise<{ id: 
                 ))}
               </div>
             )}
+          </section>
+
+          {/* Location Section with Google Maps */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2 border-b pb-4">
+              <Navigation className="h-6 w-6 text-primary" />
+              <h2 className="text-3xl font-bold font-headline">Location & Directions</h2>
+            </div>
+            <Card className="overflow-hidden border-none shadow-lg bg-white p-0 h-[400px]">
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyA8_EXAMPLE_NOT_REAL&q=${hospital.mapQuery}`}
+                // Using standard non-API key embed URL as fallback for reliability
+                srcDoc={`
+                  <style>
+                    body { margin: 0; font-family: sans-serif; }
+                    .map-container { position: relative; width: 100%; height: 100%; }
+                    iframe { width: 100%; height: 100%; border: 0; }
+                  </style>
+                  <div class="map-container">
+                    <iframe 
+                      src="https://maps.google.com/maps?q=${hospital.mapQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                      frameborder="0" 
+                      scrolling="no" 
+                      marginheight="0" 
+                      marginwidth="0">
+                    </iframe>
+                  </div>
+                `}
+              ></iframe>
+            </Card>
+            <div className="flex items-center justify-between">
+              <p className="text-muted-foreground">
+                {hospital.location}, {hospital.city}, Tamil Nadu
+              </p>
+              <Button variant="outline" size="sm" asChild>
+                <a href={`https://www.google.com/maps/search/?api=1&query=${hospital.mapQuery}`} target="_blank" rel="noopener noreferrer">
+                  Open in Google Maps
+                </a>
+              </Button>
+            </div>
           </section>
         </div>
 
