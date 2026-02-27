@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Building2, MapPin, ArrowRight, ShieldCheck, Video, BrainCircuit, HeartPulse } from "lucide-react";
+import { Building2, MapPin, ArrowRight, ShieldCheck, Video, BrainCircuit, HeartPulse, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,8 @@ export default function Home() {
       city: "Coimbatore",
       location: "Arts College Road",
       desc: "NABH Accredited Tertiary care hospital specializing in Cardiology and Nephrology.",
-      specialty: "Cardiology"
+      specialty: "Cardiology",
+      website: "https://www.kghospital.com/"
     },
     {
       id: "hospital-ganga",
@@ -29,7 +30,8 @@ export default function Home() {
       city: "Coimbatore",
       location: "Mettupalayam Road",
       desc: "World-renowned center for Orthopaedics, Trauma and Plastic Surgery.",
-      specialty: "Orthopaedics"
+      specialty: "Orthopaedics",
+      website: "https://www.gangahospital.com/"
     },
     {
       id: "hospital-psg",
@@ -37,7 +39,8 @@ export default function Home() {
       city: "Coimbatore",
       location: "Peelamedu",
       desc: "Multispeciality teaching hospital offering comprehensive patient care and research.",
-      specialty: "General Medicine"
+      specialty: "General Medicine",
+      website: "https://www.psghospitals.com/"
     },
     {
       id: "hospital-kmch",
@@ -45,7 +48,8 @@ export default function Home() {
       city: "Coimbatore",
       location: "Avinashi Road",
       desc: "A modern multi-specialty hospital with state-of-the-art diagnostic facilities.",
-      specialty: "Multi-Specialty"
+      specialty: "Multi-Specialty",
+      website: "https://www.kmchhospitals.com/"
     }
   ];
 

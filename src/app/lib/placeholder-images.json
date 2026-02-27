@@ -27,27 +27,27 @@
     },
     {
       "id": "hospital-kg",
-      "description": "KG Hospital Coimbatore Building",
-      "imageUrl": "https://picsum.photos/seed/kghospital/800/600",
-      "imageHint": "modern hospital"
+      "description": "KG Hospital Coimbatore Frontage",
+      "imageUrl": "https://picsum.photos/seed/kghospitalcoimbatore/800/600",
+      "imageHint": "hospital facade"
     },
     {
       "id": "hospital-ganga",
-      "description": "Ganga Hospital Coimbatore Entrance",
-      "imageUrl": "https://picsum.photos/seed/gangahospital/800/600",
-      "imageHint": "medical center"
+      "description": "Ganga Hospital Coimbatore Medical Center",
+      "imageUrl": "https://picsum.photos/seed/gangahospitalcbe/800/600",
+      "imageHint": "medical exterior"
     },
     {
       "id": "hospital-psg",
-      "description": "PSG Hospitals Coimbatore Campus",
-      "imageUrl": "https://picsum.photos/seed/psghospital/800/600",
-      "imageHint": "university hospital"
+      "description": "PSG Hospitals Coimbatore Campus Building",
+      "imageUrl": "https://picsum.photos/seed/psghospitalscbe/800/600",
+      "imageHint": "university building"
     },
     {
       "id": "hospital-kmch",
-      "description": "KMCH Coimbatore Modern Facility",
-      "imageUrl": "https://picsum.photos/seed/kmch/800/600",
-      "imageHint": "advanced clinic"
+      "description": "KMCH Coimbatore Modern Multi-specialty Tower",
+      "imageUrl": "https://picsum.photos/seed/kmchcoimbatore/800/600",
+      "imageHint": "modern glass-building"
     }
   ]
 }

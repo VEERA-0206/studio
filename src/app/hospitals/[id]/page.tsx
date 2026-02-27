@@ -5,7 +5,7 @@ import { use } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Star, User, Loader2, ArrowLeft, Stethoscope, Video, Calendar } from "lucide-react";
+import { MapPin, Star, User, Loader2, ArrowLeft, Stethoscope, Video, Calendar, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
@@ -19,7 +19,8 @@ const TAMILNADU_HOSPITALS = [
     city: "Coimbatore",
     location: "Arts College Road",
     desc: "NABH Accredited Tertiary care hospital specializing in Cardiology and Nephrology.",
-    specialty: "Cardiology"
+    specialty: "Cardiology",
+    website: "https://www.kghospital.com/"
   },
   {
     id: "hospital-ganga",
@@ -27,7 +28,8 @@ const TAMILNADU_HOSPITALS = [
     city: "Coimbatore",
     location: "Mettupalayam Road",
     desc: "World-renowned center for Orthopaedics, Trauma and Plastic Surgery.",
-    specialty: "Orthopaedics"
+    specialty: "Orthopaedics",
+    website: "https://www.gangahospital.com/"
   },
   {
     id: "hospital-psg",
@@ -35,7 +37,8 @@ const TAMILNADU_HOSPITALS = [
     city: "Coimbatore",
     location: "Peelamedu",
     desc: "Multispeciality teaching hospital offering comprehensive patient care and research.",
-    specialty: "General Medicine"
+    specialty: "General Medicine",
+    website: "https://www.psghospitals.com/"
   },
   {
     id: "hospital-kmch",
@@ -43,7 +46,8 @@ const TAMILNADU_HOSPITALS = [
     city: "Coimbatore",
     location: "Avinashi Road",
     desc: "A modern multi-specialty hospital with state-of-the-art diagnostic facilities.",
-    specialty: "Multi-Specialty"
+    specialty: "Multi-Specialty",
+    website: "https://www.kmchhospitals.com/"
   }
 ];
 
@@ -115,7 +119,15 @@ export default function HospitalDetailsPage({ params }: { params: Promise<{ id: 
         {/* About Section */}
         <div className="lg:col-span-2 space-y-12">
           <section className="space-y-6">
-            <h2 className="text-3xl font-bold font-headline border-b pb-4">Affiliated Specialists</h2>
+            <div className="flex items-center justify-between border-b pb-4">
+              <h2 className="text-3xl font-bold font-headline">Affiliated Specialists</h2>
+              <a href={hospital.website} target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" className="text-primary border-primary hover:bg-primary/5">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Official Website
+                </Button>
+              </a>
+            </div>
             <p className="text-lg text-muted-foreground leading-relaxed">
               Consult with top-rated medical practitioners exclusively affiliated with {hospital.name}. 
               Select a specialist below to view availability and book a secure video consultation.
@@ -213,9 +225,11 @@ export default function HospitalDetailsPage({ params }: { params: Promise<{ id: 
                 <p className="text-base text-slate-300">{hospital.location}, {hospital.city}, Tamil Nadu, India</p>
               </div>
               <div className="pt-6 border-t border-slate-800">
-                <Button className="w-full bg-white text-slate-900 hover:bg-slate-200 font-bold py-6">
-                  Contact Facility
-                </Button>
+                <a href={hospital.website} target="_blank" rel="noopener noreferrer" className="w-full block">
+                  <Button className="w-full bg-white text-slate-900 hover:bg-slate-200 font-bold py-6">
+                    Visit Official Site
+                  </Button>
+                </a>
               </div>
             </div>
           </Card>
