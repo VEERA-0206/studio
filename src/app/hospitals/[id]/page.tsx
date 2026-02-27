@@ -10,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, query, where } from "firebase/firestore";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const TAMILNADU_HOSPITALS = [
   {
@@ -18,7 +19,6 @@ const TAMILNADU_HOSPITALS = [
     city: "Coimbatore",
     location: "Arts College Road",
     desc: "NABH Accredited Tertiary care hospital specializing in Cardiology and Nephrology.",
-    image: "https://picsum.photos/seed/kghospital/1200/600",
     specialty: "Cardiology"
   },
   {
@@ -27,7 +27,6 @@ const TAMILNADU_HOSPITALS = [
     city: "Coimbatore",
     location: "Mettupalayam Road",
     desc: "World-renowned center for Orthopaedics, Trauma and Plastic Surgery.",
-    image: "https://picsum.photos/seed/gangahospital/1200/600",
     specialty: "Orthopaedics"
   },
   {
@@ -36,7 +35,6 @@ const TAMILNADU_HOSPITALS = [
     city: "Coimbatore",
     location: "Peelamedu",
     desc: "Multispeciality teaching hospital offering comprehensive patient care and research.",
-    image: "https://picsum.photos/seed/psghospital/1200/600",
     specialty: "General Medicine"
   },
   {
@@ -45,7 +43,6 @@ const TAMILNADU_HOSPITALS = [
     city: "Coimbatore",
     location: "Avinashi Road",
     desc: "A modern multi-specialty hospital with state-of-the-art diagnostic facilities.",
-    image: "https://picsum.photos/seed/kmch/1200/600",
     specialty: "Multi-Specialty"
   }
 ];
@@ -55,6 +52,7 @@ export default function HospitalDetailsPage({ params }: { params: Promise<{ id: 
   const db = useFirestore();
   
   const hospital = TAMILNADU_HOSPITALS.find(h => h.id === id);
+  const imageData = PlaceHolderImages.find(img => img.id === id);
 
   const doctorsQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -79,10 +77,12 @@ export default function HospitalDetailsPage({ params }: { params: Promise<{ id: 
       {/* Hospital Banner */}
       <div className="relative h-[400px] w-full">
         <Image 
-          src={hospital.image} 
+          src={imageData?.imageUrl || "https://picsum.photos/seed/hospital/1200/600"} 
           alt={hospital.name} 
-          fill 
-          className="object-cover" 
+          width={1200}
+          height={600}
+          className="object-cover h-full" 
+          data-ai-hint={imageData?.imageHint || "hospital campus"}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
         <div className="absolute bottom-0 left-0 w-full p-8 md:p-16">
@@ -148,8 +148,10 @@ export default function HospitalDetailsPage({ params }: { params: Promise<{ id: 
                       <Image 
                         src={doc.profileImageUrl || `https://picsum.photos/seed/${doc.id}/400/400`} 
                         alt={`${doc.firstName} ${doc.lastName}`} 
-                        fill 
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        width={400}
+                        height={400}
+                        className="object-cover h-full group-hover:scale-105 transition-transform duration-500"
+                        data-ai-hint="doctor portrait"
                       />
                       <div className="absolute top-3 right-3">
                         <Badge className="bg-white/95 text-primary hover:bg-white flex items-center gap-1 shadow-md">

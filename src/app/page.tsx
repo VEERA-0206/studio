@@ -10,6 +10,10 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
+  const getHospitalImage = (id: string) => {
+    return PlaceHolderImages.find(img => img.id === id);
+  };
+
   const TAMILNADU_HOSPITALS = [
     {
       id: "hospital-kg",
@@ -17,9 +21,7 @@ export default function Home() {
       city: "Coimbatore",
       location: "Arts College Road",
       desc: "NABH Accredited Tertiary care hospital specializing in Cardiology and Nephrology.",
-      image: "https://picsum.photos/seed/kghospital/800/600",
-      specialty: "Cardiology",
-      imageHint: "modern hospital"
+      specialty: "Cardiology"
     },
     {
       id: "hospital-ganga",
@@ -27,9 +29,7 @@ export default function Home() {
       city: "Coimbatore",
       location: "Mettupalayam Road",
       desc: "World-renowned center for Orthopaedics, Trauma and Plastic Surgery.",
-      image: "https://picsum.photos/seed/gangahospital/800/600",
-      specialty: "Orthopaedics",
-      imageHint: "medical center"
+      specialty: "Orthopaedics"
     },
     {
       id: "hospital-psg",
@@ -37,9 +37,7 @@ export default function Home() {
       city: "Coimbatore",
       location: "Peelamedu",
       desc: "Multispeciality teaching hospital offering comprehensive patient care and research.",
-      image: "https://picsum.photos/seed/psghospital/800/600",
-      specialty: "General Medicine",
-      imageHint: "university hospital"
+      specialty: "General Medicine"
     },
     {
       id: "hospital-kmch",
@@ -47,9 +45,7 @@ export default function Home() {
       city: "Coimbatore",
       location: "Avinashi Road",
       desc: "A modern multi-specialty hospital with state-of-the-art diagnostic facilities.",
-      image: "https://picsum.photos/seed/kmch/800/600",
-      specialty: "Multi-Specialty",
-      imageHint: "advanced clinic"
+      specialty: "Multi-Specialty"
     }
   ];
 
@@ -102,48 +98,52 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-10">
-            {TAMILNADU_HOSPITALS.map((hospital) => (
-              <Link key={hospital.id} href={`/hospitals/${hospital.id}`}>
-                <Card className="group border-none shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer bg-slate-50/50">
-                  <div className="grid lg:grid-cols-5 h-full">
-                    <div className="lg:col-span-2 relative min-h-[240px]">
-                      <Image
-                        src={hospital.image}
-                        alt={hospital.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                        data-ai-hint={hospital.imageHint}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent lg:hidden" />
-                      <div className="absolute bottom-4 left-4 lg:hidden">
-                         <Badge className="bg-primary shadow-lg">{hospital.specialty}</Badge>
+            {TAMILNADU_HOSPITALS.map((hospital) => {
+              const imageData = getHospitalImage(hospital.id);
+              return (
+                <Link key={hospital.id} href={`/hospitals/${hospital.id}`}>
+                  <Card className="group border-none shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer bg-slate-50/50">
+                    <div className="grid lg:grid-cols-5 h-full">
+                      <div className="lg:col-span-2 relative min-h-[240px]">
+                        <Image
+                          src={imageData?.imageUrl || "https://picsum.photos/seed/hospital/800/600"}
+                          alt={hospital.name}
+                          width={800}
+                          height={600}
+                          className="object-cover h-full group-hover:scale-105 transition-transform duration-700"
+                          data-ai-hint={imageData?.imageHint || "hospital building"}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent lg:hidden" />
+                        <div className="absolute bottom-4 left-4 lg:hidden">
+                           <Badge className="bg-primary shadow-lg">{hospital.specialty}</Badge>
+                        </div>
                       </div>
+                      <CardContent className="lg:col-span-3 p-8 flex flex-col justify-between">
+                        <div className="space-y-4">
+                          <div className="hidden lg:block">
+                            <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5 mb-2">
+                              {hospital.specialty}
+                            </Badge>
+                          </div>
+                          <CardTitle className="text-3xl font-bold group-hover:text-primary transition-colors">{hospital.name}</CardTitle>
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <MapPin className="h-4 w-4 text-primary" />
+                            <span className="text-sm font-medium">{hospital.location}, {hospital.city}</span>
+                          </div>
+                          <p className="text-muted-foreground leading-relaxed line-clamp-3">
+                            {hospital.desc}
+                          </p>
+                        </div>
+                        <div className="pt-6 flex items-center justify-between text-primary font-bold group-hover:gap-2 transition-all">
+                          <span>View Specialists</span>
+                          <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform" />
+                        </div>
+                      </CardContent>
                     </div>
-                    <CardContent className="lg:col-span-3 p-8 flex flex-col justify-between">
-                      <div className="space-y-4">
-                        <div className="hidden lg:block">
-                          <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5 mb-2">
-                            {hospital.specialty}
-                          </Badge>
-                        </div>
-                        <CardTitle className="text-3xl font-bold group-hover:text-primary transition-colors">{hospital.name}</CardTitle>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <MapPin className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-medium">{hospital.location}, {hospital.city}</span>
-                        </div>
-                        <p className="text-muted-foreground leading-relaxed line-clamp-3">
-                          {hospital.desc}
-                        </p>
-                      </div>
-                      <div className="pt-6 flex items-center justify-between text-primary font-bold group-hover:gap-2 transition-all">
-                        <span>View Specialists</span>
-                        <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform" />
-                      </div>
-                    </CardContent>
-                  </div>
-                </Card>
-              </Link>
-            ))}
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
