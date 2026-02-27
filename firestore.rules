@@ -67,14 +67,14 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for Doctor profiles. Publicly readable by signed-in users.
+     * @description Rules for Doctor profiles. Publicly readable for discovery.
      * @path /doctors/{doctorId}
-     * @allow (get, list) if any user is signed in.
+     * @allow (get, list) if true.
      * @deny (update) if a user attempts to change another doctor's profile.
      * @principle Public profile pattern with restricted write access.
      */
     match /doctors/{doctorId} {
-      allow get, list: if isSignedIn();
+      allow get, list: if true;
       allow create: if isOwner(doctorId) && request.resource.data.id == doctorId;
       allow update: if isExistingOwner(doctorId) && request.resource.data.id == resource.data.id;
       allow delete: if isAdmin();
@@ -82,12 +82,12 @@ service cloud.firestore {
       /**
        * @description Recurring availability patterns for doctors.
        * @path /doctors/{doctorId}/availability/{availabilityId}
-       * @allow (list) if signed in (to book appointments).
+       * @allow (list) if true (to browse before booking).
        * @deny (create) if the doctorId in the path does not match the authenticated user.
        * @principle Nested ownership with public listability for service discovery.
        */
       match /availability/{availabilityId} {
-        allow get, list: if isSignedIn();
+        allow get, list: if true;
         allow create: if isOwner(doctorId);
         allow update, delete: if isExistingOwner(doctorId);
       }
@@ -101,7 +101,7 @@ service cloud.firestore {
      * @principle Shared access (Closed Collaborators) using denormalized IDs.
      */
     match /appointments/{appointmentId} {
-      allow get, list: if isParticipant(resource.data.patientId, resource.data.doctorId) || isAdmin();
+      allow get, list: if (resource != null && isParticipant(resource.data.patientId, resource.data.doctorId)) || isAdmin();
       allow create: if isParticipant(request.resource.data.patientId, request.resource.data.doctorId);
       allow update: if (resource != null && isParticipant(resource.data.patientId, resource.data.doctorId)) || isAdmin();
       allow delete: if isAdmin();
@@ -115,7 +115,7 @@ service cloud.firestore {
      * @principle Shared access with global Admin monitoring.
      */
     match /conversations/{conversationId} {
-      allow get, list: if isParticipant(resource.data.patientId, resource.data.doctorId) || isAdmin();
+      allow get, list: if (resource != null && isParticipant(resource.data.patientId, resource.data.doctorId)) || isAdmin();
       allow create: if isParticipant(request.resource.data.patientId, request.resource.data.doctorId);
       allow update: if resource != null && isParticipant(resource.data.patientId, resource.data.doctorId);
       allow delete: if isAdmin();
@@ -128,7 +128,7 @@ service cloud.firestore {
        * @principle Authorization Independence: uses data on the message to avoid parent lookups.
        */
       match /messages/{messageId} {
-        allow get, list: if isParticipant(resource.data.patientId, resource.data.doctorId) || isAdmin();
+        allow get, list: if (resource != null && isParticipant(resource.data.patientId, resource.data.doctorId)) || isAdmin();
         allow create: if isParticipant(request.resource.data.patientId, request.resource.data.doctorId) && request.resource.data.senderId == request.auth.uid;
         allow update: if resource != null && isParticipant(resource.data.patientId, resource.data.doctorId);
         allow delete: if false;
