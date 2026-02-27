@@ -1,0 +1,29 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "doctor-1",
+      "description": "Professional female doctor smiling in a clinic",
+      "imageUrl": "https://picsum.photos/seed/doctor1/600/400",
+      "imageHint": "doctor female"
+    },
+    {
+      "id": "doctor-2",
+      "description": "Experienced male cardiologist in his office",
+      "imageUrl": "https://picsum.photos/seed/doctor2/600/400",
+      "imageHint": "doctor male"
+    },
+    {
+      "id": "doctor-3",
+      "description": "Friendly pediatrician with a stethoscope",
+      "imageUrl": "https://picsum.photos/seed/doctor3/600/400",
+      "imageHint": "pediatrician doctor"
+    },
+    {
+      "id": "hero-medical",
+      "description": "Modern medical facility hallway",
+      "imageUrl": "https://picsum.photos/seed/medical-hero/1200/600",
+      "imageHint": "medical hospital"
+    }
+  ]
+}
