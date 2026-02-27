@@ -45,7 +45,7 @@ export function Navbar() {
 
         <div className="hidden md:flex items-center gap-6">
           <Link href="/doctors" className="text-sm font-medium hover:text-primary transition-colors">Specialists</Link>
-          <Link href="/hospitals" className="flex items-center gap-1.5 text-sm font-medium hover:text-primary transition-colors">
+          <Link href="/#hospitals" className="flex items-center gap-1.5 text-sm font-medium hover:text-primary transition-colors">
             <Building2 className="h-4 w-4" />
             Hospitals
           </Link>
