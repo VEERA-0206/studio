@@ -1,9 +1,9 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { Navbar } from '@/components/Navbar';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { ChatBot } from '@/components/ChatBot';
 
 export const metadata: Metadata = {
   title: 'MoDoc - Remote Healthcare',
@@ -28,6 +28,7 @@ export default function RootLayout({
           <main className="flex-1">
             {children}
           </main>
+          <ChatBot />
           <Toaster />
           <footer className="border-t bg-white py-8 mt-auto">
             <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">

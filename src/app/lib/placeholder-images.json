@@ -1,53 +1,28 @@
-
 {
   "placeholderImages": [
     {
-      "id": "doctor-1",
-      "description": "Professional female doctor smiling in a clinic",
-      "imageUrl": "https://picsum.photos/seed/doctor1/600/400",
-      "imageHint": "doctor female"
-    },
-    {
-      "id": "doctor-2",
-      "description": "Experienced male cardiologist in his office",
-      "imageUrl": "https://picsum.photos/seed/doctor2/600/400",
-      "imageHint": "doctor male"
-    },
-    {
-      "id": "doctor-3",
-      "description": "Friendly pediatrician with a stethoscope",
-      "imageUrl": "https://picsum.photos/seed/doctor3/600/400",
-      "imageHint": "pediatrician doctor"
-    },
-    {
-      "id": "hero-medical",
-      "description": "Modern medical facility hallway",
-      "imageUrl": "https://picsum.photos/seed/medical-hero/1200/600",
-      "imageHint": "medical hospital"
-    },
-    {
       "id": "hospital-kg",
-      "description": "KG Hospital Coimbatore Exterior Architectural View",
-      "imageUrl": "https://picsum.photos/seed/kgcoimbatorehospital/1200/800",
-      "imageHint": "hospital building"
+      "description": "KG Hospital Coimbatore - Modern Tertiary Care Facility",
+      "imageUrl": "https://picsum.photos/seed/kghospital_cbe_1/1200/800",
+      "imageHint": "modern hospital building exterior"
     },
     {
       "id": "hospital-ganga",
-      "description": "Ganga Hospital Coimbatore Specialist Medical Wing",
-      "imageUrl": "https://picsum.photos/seed/gangacoimbatore/1200/800",
-      "imageHint": "modern medical"
+      "description": "Ganga Hospital Coimbatore - Specialist Orthopedic Center",
+      "imageUrl": "https://picsum.photos/seed/gangahospital_cbe_2/1200/800",
+      "imageHint": "medical center architecture"
     },
     {
       "id": "hospital-psg",
-      "description": "PSG Hospitals Coimbatore Campus Main Entrance",
-      "imageUrl": "https://picsum.photos/seed/psgcoimbatore/1200/800",
-      "imageHint": "hospital campus"
+      "description": "PSG Hospitals Coimbatore - Educational Medical Campus",
+      "imageUrl": "https://picsum.photos/seed/psghospitals_cbe_3/1200/800",
+      "imageHint": "large medical campus"
     },
     {
       "id": "hospital-kmch",
-      "description": "KMCH Coimbatore Modern Multi-specialty Healthcare Tower",
-      "imageUrl": "https://picsum.photos/seed/kmchcoimbatoremodern/1200/800",
-      "imageHint": "medical architecture"
+      "description": "KMCH Coimbatore - State-of-the-art Multi-specialty Tower",
+      "imageUrl": "https://picsum.photos/seed/kmch_cbe_4/1200/800",
+      "imageHint": "modern glass hospital tower"
     }
   ]
 }
