@@ -3,6 +3,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Navbar } from '@/components/Navbar';
 import { Toaster } from '@/components/ui/toaster';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
   title: 'MoDoc - Remote Healthcare',
@@ -22,16 +23,18 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Toaster />
-        <footer className="border-t bg-white py-8 mt-auto">
-          <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
-            <p>&copy; {new Date().getFullYear()} MoDoc. All rights reserved.</p>
-          </div>
-        </footer>
+        <FirebaseClientProvider>
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Toaster />
+          <footer className="border-t bg-white py-8 mt-auto">
+            <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
+              <p>&copy; {new Date().getFullYear()} MoDoc. All rights reserved.</p>
+            </div>
+          </footer>
+        </FirebaseClientProvider>
       </body>
     </html>
   );

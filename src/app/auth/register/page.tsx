@@ -3,22 +3,80 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Stethoscope, CheckCircle2 } from "lucide-react";
+import { Stethoscope, CheckCircle2, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth, useFirestore } from "@/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const { auth } = useAuth ? { auth: useAuth() } : { auth: null };
+  const db = useFirestore ? useFirestore() : null;
+  const router = useRouter();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent, type: 'patient' | 'doctor') => {
     e.preventDefault();
+    if (!auth || !db) return;
+
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const firstName = formData.get('first-name') as string;
+    const lastName = formData.get('last-name') as string;
+
     setIsLoading(true);
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 1000);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      if (type === 'patient') {
+        await setDoc(doc(db, "patients", user.uid), {
+          id: user.uid,
+          externalAuthId: user.uid,
+          firstName,
+          lastName,
+          email,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        const specialty = formData.get('specialty') as string;
+        const license = formData.get('license') as string;
+        await setDoc(doc(db, "doctors", user.uid), {
+          id: user.uid,
+          externalAuthId: user.uid,
+          firstName,
+          lastName,
+          email,
+          specializations: [specialty],
+          licenseNumber: license,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          averageRating: 0
+        });
+      }
+
+      toast({
+        title: "Account Created",
+        description: `Welcome to MoDoc, ${firstName}!`,
+      });
+      router.push("/dashboard");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Registration Failed",
+        description: error.message || "Could not create account.",
+      });
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -43,57 +101,61 @@ export default function RegisterPage() {
             </TabsList>
             
             <TabsContent value="patient" className="mt-6">
-              <form onSubmit={handleSubmit} className="grid gap-4">
+              <form onSubmit={(e) => handleRegister(e, 'patient')} className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" placeholder="John" required />
+                    <Input id="first-name" name="first-name" placeholder="John" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" placeholder="Doe" required />
+                    <Input id="last-name" name="last-name" placeholder="Doe" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" required />
+                  <Input id="email" name="email" type="email" placeholder="john@example.com" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" required />
+                  <Input id="password" name="password" type="password" required />
                 </div>
                 <Button className="w-full bg-primary hover:bg-accent mt-4" type="submit" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Create Account"}
+                  {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : "Create Account"}
                 </Button>
               </form>
             </TabsContent>
             
             <TabsContent value="doctor" className="mt-6">
-              <form onSubmit={handleSubmit} className="grid gap-4">
+              <form onSubmit={(e) => handleRegister(e, 'doctor')} className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="doc-first-name">First Name</Label>
-                    <Input id="doc-first-name" required />
+                    <Input id="doc-first-name" name="first-name" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="doc-last-name">Last Name</Label>
-                    <Input id="doc-last-name" required />
+                    <Input id="doc-last-name" name="last-name" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="specialty">Specialization</Label>
-                  <Input id="specialty" placeholder="e.g. Cardiology" required />
+                  <Input id="specialty" name="specialty" placeholder="e.g. Cardiology" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="license">Medical License Number</Label>
-                  <Input id="license" required />
+                  <Input id="license" name="license" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="doc-email">Email</Label>
-                  <Input id="doc-email" type="email" required />
+                  <Input id="doc-email" name="email" type="email" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="doc-password">Password</Label>
+                  <Input id="doc-password" name="password" type="password" required />
                 </div>
                 <Button className="w-full bg-primary hover:bg-accent mt-4" type="submit" disabled={isLoading}>
-                  Join as Practitioner
+                  {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : "Join as Practitioner"}
                 </Button>
               </form>
             </TabsContent>
